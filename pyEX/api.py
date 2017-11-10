@@ -6,7 +6,7 @@ from io import BytesIO
 
 
 _URL_PREFIX = 'https://api.iextrading.com/1.0/'
-_TIMEFRAME_CHART = ['5y', '2y', '1y', 'ytd', '6m', '3m', '1m', '1d']
+_TIMEFRAME_CHART = ['5y', '2y', '1y', 'ytd', '6m', '3m', '1m', '1d', 'dynamic']
 _TIMEFRAME_DIVSPLIT = ['5y', '2y', '1y', 'ytd', '6m', '3m', '1m']
 _LIST_OPTIONS = ['mostactive', 'gainers', 'losers', 'iexvolume', 'iexpercent']
 
@@ -16,7 +16,9 @@ def _getJson(url):
     resp = requests.get(url)
     if resp.status_code == 200:
         return resp.json()
-    raise Exception('Response %d - ' % resp.status_code, resp.text)
+    else:
+        print("Response error %d. Trying again..." % resp.status_code)
+        _getJson(url)
 
 
 def _df(resp):
@@ -182,3 +184,51 @@ def list(option='mostactive'):
 
 def listDF(option='mostactive'):
     return pd.DataFrame(list(option))
+
+
+#################### Added by Rigo #####################
+
+
+def _getTOPS(symbol):
+    return _getJson('tops?symbols=' + symbol)
+
+
+def get_marketPercent(symbol):
+    return _getTOPS(symbol)[0]['marketPercent']
+
+
+def get_bidSize(symbol):
+    return _getTOPS(symbol)[0]['bidSize']
+
+
+def get_bidPrice(symbol):
+    return _getTOPS(symbol)[0]['bidPrice']
+
+
+def get_askSize(symbol):
+    return _getTOPS(symbol)[0]['askSize']
+
+
+def get_askPrice(symbol):
+    return _getTOPS(symbol)[0]['askPrice']
+
+
+def get_volume(symbol):
+    return _getTOPS(symbol)[0]['volume']
+
+
+def get_lastSalePrice(symbol):
+    return _getTOPS(symbol)[0]['lastSalePrice']
+
+
+def get_lastSaleSize(symbol):
+    return _getTOPS(symbol)[0]['lastSaleSize']
+
+
+def get_lastSaleTime(symbol):
+    return _getTOPS(symbol)[0]['lastSaleTime']
+
+
+def get_lastUpdated(symbol):
+    return _getTOPS(symbol)[0]['lastUpdated']
+
